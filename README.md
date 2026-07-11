@@ -24,7 +24,7 @@ The image bundles Linux **ffmpeg/ffprobe** and **yt-dlp**, builds the web UI,
 and can **self-update from this repo on every start**.
 
 ```
-git clone https://github.com/YOUR_GITHUB_USER/nebula.git
+git clone https://github.com/hakimarun/nebula.git
 cd nebula
 cp .env.example .env        # optional: set REPO_URL + GITHUB_TOKEN for auto-update
 docker compose up -d --build
