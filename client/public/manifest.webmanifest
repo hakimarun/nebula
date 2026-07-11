@@ -1,0 +1,17 @@
+{
+  "name": "NEBULA",
+  "short_name": "NEBULA",
+  "description": "Self-hosted media server — movies, series, music, photos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='120' fill='%2307090d'/%3E%3Crect x='136' y='136' width='240' height='240' rx='64' fill='%2359e0b8'/%3E%3Crect x='208' y='208' width='96' height='96' rx='24' fill='%2306120d'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

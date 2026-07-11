@@ -1,0 +1,14 @@
+# keep the image small — these are reinstalled/rebuilt inside the container.
+# NOTE: .git is intentionally NOT ignored so the container can self-update.
+node_modules
+client/node_modules
+client/dist
+data
+tools
+.env
+.env.*
+*.log
+*.db
+*.db-shm
+*.db-wal
+*.db.bak-*

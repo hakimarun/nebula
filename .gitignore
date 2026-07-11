@@ -1,0 +1,30 @@
+# --- dependencies (reinstalled by Docker / npm) ---
+node_modules/
+client/node_modules/
+
+# --- build output (rebuilt by `npm run build`) ---
+client/dist/
+
+# --- runtime data — NEVER commit: contains the database, JWT secret,
+#     user accounts, API keys, thumbnail cache and downloaded media ---
+data/
+*.db
+*.db-shm
+*.db-wal
+*.db.bak-*
+
+# --- platform-specific tool binaries (Docker installs Linux ffmpeg/yt-dlp) ---
+tools/
+
+# --- secrets / local environment ---
+.env
+.env.*
+!.env.example
+.secret
+*.secret
+
+# --- logs / OS cruft ---
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
