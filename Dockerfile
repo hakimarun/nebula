@@ -26,10 +26,15 @@ COPY . /app
 
 # install server dependencies + build the web client into client/dist so the
 # first start is fast (the entrypoint rebuilds only when an update lands).
+# Also scrub any build-time git auth header so no token is baked into the image,
+# and leave a clean origin for the optional self-update on start.
 RUN npm install --omit=dev \
  && npm run build \
  && npm cache clean --force \
- && chmod +x docker/entrypoint.sh
+ && chmod +x docker/entrypoint.sh \
+ && git config --global --add safe.directory /app \
+ && git config --global --unset-all http.https://github.com/.extraheader 2>/dev/null || true \
+ && git -C /app config --unset-all http.https://github.com/.extraheader 2>/dev/null || true
 
 ENV NODE_ENV=production \
     NEBULA_PORT=80 \

@@ -20,34 +20,39 @@ To develop the UI with hot reload: `cd client && npm run dev` (proxies to :8474)
 
 ## Run with Docker (QNAP Container Station)
 
-The image bundles Linux **ffmpeg/ffprobe** and **yt-dlp**, builds the web UI,
-and can **self-update from this repo on every start**.
-
-```
-git clone https://github.com/hakimarun/nebula.git
-cd nebula
-cp .env.example .env        # optional: set REPO_URL + GITHUB_TOKEN for auto-update
-docker compose up -d --build
-```
-
-QNAP Container Station gives the container its own IP on the LAN, so the app
-listens on **port 80** — open `http://<container-ip>/` and finish the setup
-wizard.
+A prebuilt image (Linux **ffmpeg/ffprobe** + **yt-dlp** bundled, web UI built in)
+is published to **GitHub Container Registry** by CI on every push to `main`, for
+`linux/amd64` and `linux/arm64`. QNAP Container Station just pulls it — no build
+context needed, which is why the earlier `build: .` paste failed.
 
 **On the QNAP:**
 
-1. Copy this repo to a share, e.g. `/share/Container/nebula`.
-2. Container Station → **Create Application** → paste `docker-compose.yml`
-   (or point it at the folder) → **Create**.
-3. Mount your media: uncomment the `- /share/Multimedia:/media:ro` volume in
-   `docker-compose.yml`, then set the app's **Library folders** to `/media/...`.
+1. **Log in to ghcr once** so the NAS can pull the private image
+   (Container Station → Registry → add a `ghcr.io` registry, or on a shell):
+   ```
+   docker login ghcr.io -u hakimarun     # paste a PAT with the read:packages scope
+   ```
+   *(Alternatively make the package public on GitHub → Packages → nebula →
+   Package settings → Change visibility, then no login is needed.)*
+2. Container Station → **Create Application** → paste `docker-compose.yml` →
+   **Create**. QNAP gives the container its own LAN IP and the app listens on
+   **port 80** → open `http://<container-ip>/` and finish the setup wizard.
+3. Mount your media: uncomment `- /share/Multimedia:/media:ro` in the compose,
+   then set the app's **Library folders** to `/media/...`.
 4. Data (database, secret, cache, downloads) lives in the `nebula-data` volume
-   and survives updates/rebuilds.
+   and survives updates/recreates.
 
-**Automatic updates** — with `REPO_URL` + a read-only `GITHUB_TOKEN` in `.env`,
-the container fetches the latest commit on start, reinstalls dependencies,
-rebuilds the UI and launches. Without them it just runs the built-in version.
-Recreate the container (or restart it) to pull the newest code.
+> First time: the image only exists after the **build-and-push** GitHub Action
+> finishes (repo → Actions tab). Give it a few minutes after the first push.
+
+**Updating** — the compose uses `pull_policy: always`, so recreating the
+container pulls the newest image (CI rebuilds it on every push to `main`).
+Optionally set `AUTO_UPDATE=true` + `REPO_URL` + a read-only `GITHUB_TOKEN` to
+also `git pull` the latest code on every start without waiting for a rebuild.
+
+**Build on the NAS instead** (no registry, needs SSH): clone the repo to a share
+and use the commented `build: .` service in `docker-compose.yml`, then
+`docker compose up -d --build`.
 
 **DLNA / casting / `nebula.local`** rely on LAN multicast. If discovery doesn't
 work through the bridge network, switch to host networking (see the commented

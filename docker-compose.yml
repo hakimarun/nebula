@@ -1,19 +1,21 @@
 # NEBULA on QNAP Container Station (or any Docker host).
 #
-#   1) Clone this repo onto the NAS (e.g. /share/Container/nebula).
-#   2) Copy .env.example to .env and fill in REPO_URL + GITHUB_TOKEN if you want
-#      automatic updates from your private repo (optional).
-#   3) Container Station -> Create Application -> paste/point to this file,
-#      or on a shell:  docker compose up -d --build
+# This file references a PREBUILT image from GitHub Container Registry, so you
+# can paste it straight into Container Station -> Create Application. It does not
+# need a build context.
+#
+# One-time on the NAS (private image needs a pull login):
+#   docker login ghcr.io -u hakimarun          # paste a PAT with read:packages
+# (or make the package public on GitHub to skip the login.)
 #
 # QNAP gives the container its own IP on the LAN, so the app listens on port 80
 # and you reach it at  http://<container-ip>/
 services:
   nebula:
-    build: .
-    image: nebula:latest
+    image: ghcr.io/hakimarun/nebula:latest
     container_name: nebula
     restart: unless-stopped
+    pull_policy: always            # re-pull the newest image on (re)create
 
     ports:
       - "80:80"
@@ -22,9 +24,11 @@ services:
       NEBULA_PORT: "80"
       NEBULA_DATA: /data
       TZ: ${TZ:-Europe/Berlin}
-      # ---- self-update on every start ----
-      AUTO_UPDATE: "true"
-      REPO_URL: ${REPO_URL:-}          # e.g. https://github.com/you/nebula.git
+      # ---- optional: also self-update the app code from the repo on start ----
+      #      (for a private repo, set a read-only GITHUB_TOKEN). Leave AUTO_UPDATE
+      #      false to update only by re-pulling the image above.
+      AUTO_UPDATE: "false"
+      REPO_URL: ${REPO_URL:-}          # e.g. https://github.com/hakimarun/nebula.git
       REPO_BRANCH: ${REPO_BRANCH:-main}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}  # fine-grained PAT (read-only) for a private repo
 
@@ -38,6 +42,19 @@ services:
     #      doesn't work with the bridge above, use host networking instead:
     #      comment out "ports:" above and uncomment the line below.
     # network_mode: host
+
+  # ---- ALTERNATIVE: build on the NAS from a cloned repo instead of pulling the
+  #      prebuilt image (needs SSH: `docker compose up -d --build`). Remove the
+  #      "nebula" service above and use this one:
+  #
+  # nebula:
+  #   build: .
+  #   container_name: nebula
+  #   restart: unless-stopped
+  #   ports: ["80:80"]
+  #   environment: { NEBULA_PORT: "80", NEBULA_DATA: /data, AUTO_UPDATE: "true",
+  #                  REPO_URL: "https://github.com/hakimarun/nebula.git", GITHUB_TOKEN: "" }
+  #   volumes: [ "nebula-data:/data" ]
 
 volumes:
   nebula-data:
