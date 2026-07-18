@@ -27,7 +27,7 @@ if (fs.existsSync(SECRET_FILE)) {
 module.exports = {
   ROOT, DATA_DIR, DB_FILE, BACKUP_DIR, UPLOAD_TMP, CACHE_DIR, CLIENT_DIST,
   JWT_SECRET: secret,
-  PORT: Number(process.env.NEBULA_PORT || 8474),
+  PORT: Number(process.env.NEBULA_PORT || 80),
   VIDEO_EXT: ['.mp4', '.mkv', '.webm', '.avi', '.mov', '.m4v', '.ts', '.wmv', '.flv'],
   AUDIO_EXT: ['.mp3', '.flac', '.m4a', '.aac', '.ogg', '.opus', '.wav', '.wma'],
   IMAGE_EXT: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.avif'],
